@@ -1,6 +1,6 @@
 body{
     font-family: 'Courier New', Courier, monospace;
-    background-image: url(../imagenes/ChatGPT\ Image\ 29\ sept\ 2025\,\ 12_21_55\ p.m..png);
+    background-image: url(ChatGPT\ Image\ 29\ sept\ 2025\,\ 12_21_55\ p.m..png);
     /* height: 100vh; */
     text-align: center;
 }
@@ -115,4 +115,5 @@ h6{
     cursor: pointer;
     margin-top: 20px;
     border: 3px solid;
+
 }
