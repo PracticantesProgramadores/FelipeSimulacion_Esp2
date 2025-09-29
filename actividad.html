@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/estilo.css"> 
+    <title>Actividad de Lenguaje</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Actividad de lenguaje</h1>
+        <h3>Para esta actividad deberas de mover el recuadro naranja con las flechas del teclado y atrapar las palabras relacionadas con los temas vistos en el curso.<br>Las palabras correctas son 10pts, las incorrectas y correctas que no recojas son -5pts</h3>
+        <h6>Cuando estes preparado presiona el boton Iniciar</h6>
+        <div class="bTiempo">
+            <div id="bProgreso"></div>
+        </div>
+        <div id="containerJ">
+            <div id="jugador"></div>
+            <div id="puntosTabla">Puntos: 0</div>
+        </div>
+        <button class="btnI" onclick="iniciar()">Iniciar</button>
+        <a href="../html/index.html"><button class="btnF">Salir</button></a>
+    </div>
+    <script>
+        const container= document.getElementById("containerJ");
+        const jugador = document.getElementById("jugador");
+        const puntosTabla = document.getElementById("puntosTabla");
+
+        let puntos= 0;
+        let jugadorX= 270;
+        const velocidad= 20;
+
+        let intervaloProg;
+        let intervaloFalling;
+        let duracion= 50000;
+        let tiempoTranscurrido= 0;
+        let juegoActivo= false;
+
+        let respCorrectas= 0;
+        let respIncorrectas= 0;
+        let noRespond= 0;
+
+        
+        const opciones= [
+            { text: "Sustantivo", correct: true },
+            { text: "Verbo", correct: true },
+            { text: "Adjetivo", correct: true },
+            { text: "Chocolate", correct: false },
+            { text: "Zapatos", correct: false },
+            { text: "Celular", correct: false },
+            { text: "Pronombre", correct: true },
+            { text: "Metáfora", correct: true },
+            { text: "Símil", correct: true },
+            { text: "PlayStation", correct: false },
+            { text: "Balón", correct: false },
+            { text: "Facebook", correct: false },
+            { text: "Hipérbole", correct: true },
+            { text: "Narrativo", correct: true },
+            { text: "Lírico", correct: true },
+            { text: "Carro", correct: false },
+            { text: "Pizza", correct: false },
+            { text: "Avión", correct: false },
+            { text: "Emisor", correct: true },
+            { text: "Receptor", correct: true },
+            { text: "Mensaje", correct: true },
+            { text: "Helado", correct: false },
+            { text: "Lámpara", correct: false },
+            { text: "Código", correct: true },
+            { text: "Narrador", correct: true },
+            { text: "Sinónimo", correct: true },
+            { text: "Personaje", correct: true },
+            { text: "Antónimo", correct: true },
+        ]
+
+        function iniciar(){
+            juegoActivo= true;
+        }
+
+        let barra= document.getElementById("bProgreso");
+        barra.style.width= "0%";
+
+        intervaloProg = setInterval(() => {
+            if(!juegoActivo) return;
+            tiempoTranscurrido += 100;
+            let progreso= (tiempoTranscurrido / duracion) * 100;
+            barra.style.width= progreso + "%";
+
+            if(tiempoTranscurrido >= duracion){
+                clearInterval(intervaloProg);
+                clearInterval(intervaloFalling);
+                juegoActivo= false;
+                alert("La actividad ha finalizado. Puntos finales: "+puntos+ "\n Respuestas Correctas: "+respCorrectas+ "\n Respuestas Incorrectas: "+respIncorrectas+ "\n No respondidas: "+noRespond);
+                window.location.href= 'index.html';
+            }
+        }, 50);
+
+        document.addEventListener("keydown", (e) => {
+            if(e.key === "ArrowLeft" && jugadorX > 0){
+                jugadorX -= velocidad;
+            }else if(e.key === "ArrowRight" && jugadorX < (container.offsetWidth - jugador.offsetWidth)){
+                jugadorX += velocidad;
+            }
+            jugador.style.left = jugadorX + "px";
+        });
+
+        const anchoFalling= 100;
+        function createFalling(){
+            if(!juegoActivo) return;
+
+            const option= opciones[Math.floor(Math.random() * opciones.length)];
+            const falling= document.createElement("div");
+            falling.classList.add("falling");
+            falling.innerText= option.text;
+            falling.dataset.correct= option.correct;
+
+
+            falling.style.left= Math.floor(Math.random() * (container.offsetWidth - anchoFalling)) + "px";
+            container.appendChild(falling);
+
+            let fallingY = 0;
+            const fallInterval= setInterval(() => {
+                if(!juegoActivo){
+                    clearInterval(fallInterval);
+                    if(falling.parentNode) container.removeChild(falling);
+                    return;
+                }
+
+                fallingY += 4;
+                falling.style.top= fallingY + "px";
+
+                const jugadorRect = jugador.getBoundingClientRect();
+                const fallRect = falling.getBoundingClientRect();
+
+                
+
+                if(fallRect.bottom >= jugadorRect.top && fallRect.left < jugadorRect.right && fallRect.right > jugadorRect.left && fallRect.top < jugadorRect.bottom){
+                    if(falling.dataset.correct === "true"){
+                        puntos += 10;
+                        respCorrectas ++;
+                    }else{
+                        puntos -= 5;
+                        respIncorrectas ++;
+                    }
+                    puntosTabla.innerText = "Puntos: " + puntos;
+                    container.removeChild(falling);
+                    clearInterval(fallInterval);
+                }
+
+                if(fallingY > container.offsetHeight - 40){
+                    if(falling.dataset.correct === "true"){
+                        puntos -= 5;
+                        noRespond ++;
+                    }
+                    puntosTabla.innerText = "Puntos: " + puntos;
+                    container.removeChild(falling);
+                    clearInterval(fallInterval);
+                }
+            }, 30);
+        }
+        intervaloFalling= setInterval(createFalling, 2000)
+
+    </script>
+</body>
+</html>
